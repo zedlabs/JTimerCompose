@@ -16,6 +16,7 @@
 package com.example.androiddevchallenge
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Canvas
@@ -31,7 +32,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androiddevchallenge.ui.MainViewModel
 import com.example.androiddevchallenge.ui.TimePicker
@@ -51,18 +56,28 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-// Start building your app here!
 @Composable
 fun MyApp() {
-    Surface(color = Color.DarkGray) {
+    Surface(color = Color.Black) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Set Time ⏰⏰",
+                    fontSize = 26.sp,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.White,
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+            }
             TimePicker()
-            TimerBox(elapsedTime = 2000, totalTime = 10000)
+            TimerBox()
         }
 
     }
@@ -71,21 +86,29 @@ fun MyApp() {
 @Composable
 fun TimerBox(
     modifier: Modifier = Modifier,
-    elapsedTime: Long,
-    totalTime: Long,
 
     ) {
     val vm: MainViewModel = viewModel()
-    val time by vm.remTime1.observeAsState("")
+    val totTime by vm.totTime.observeAsState(0L)
+    val remTime by vm.remTime.observeAsState(0L)
+    val gText by vm.gText.observeAsState("")
 
     Column {
         Box(modifier = modifier) {
-            TimerCircle(elapsedTime = elapsedTime, totalTime = totalTime)
-            Text(
-                text = time,
-                modifier = Modifier.offset(x = 110.dp, y = 190.dp),
-                color = Color.Yellow
-            )
+            TimerCircle(elapsedTime = (totTime - remTime), totalTime = totTime)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 180.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = gText,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.White
+                )
+            }
         }
         Spacer(modifier = Modifier.height(10.dp))
         StartAndPauseButton(vm)
@@ -100,35 +123,56 @@ fun StartAndPauseButton(vm: MainViewModel) {
     val time2 by vm.time2.observeAsState("")
     val time1 by vm.time1.observeAsState("")
 
+    fun startTimer(tot: Long) {
+        object : CountDownTimer(tot, 10) {
+            override fun onTick(millisRemaining: Long) {
+                vm.onRemChanged(millisRemaining)
+            }
+
+            override fun onFinish() {
+                vm.onRemChanged(0)
+                vm.changeDisplayText("Done!")
+            }
+        }.start()
+    }
+
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Button(onClick = {
-            vm.onRemChanged(getTimeInMs(time1, time2, time3))
+            val totalTime = getTimeInMs(time1, time2, time3)
+            vm.onRemChanged(0)
+            vm.onTotChanged(totalTime)
+            vm.changeDisplayText("Running...")
+            startTimer(totalTime)
+
         }) {
-            Text(text = "Start")
+            Text(text = "Start", color = Color.White)
         }
         Spacer(modifier = Modifier.width(10.dp))
         Button(onClick = {
             vm.setTime3("")
             vm.setTime2("")
             vm.setTime1("")
-            vm.onRemChanged("Set Time to start Timer")
+            vm.onRemChanged(0)
+            vm.onTotChanged(0)
+            vm.changeDisplayText("set time ⬆, start ⬇")
         }) {
-            Text(text = "Reset")
+            Text(text = "Reset", color = Color.White)
         }
     }
 }
 
-fun getTimeInMs(time1: String, time2: String, time3: String): String {
+fun getTimeInMs(time1: String, time2: String, time3: String): Long {
 
     var time = 0
-    if(time3 != "") time+=(time3.toInt()*10)
-    if(time2 != "") time+=(time2.toInt()*60*10)
-    if(time1 != "") time+=(time1.toInt()*60*60*10)
+    if (time3 != "") time += (time3.toInt() * 1000)
+    if (time2 != "") time += (time2.toInt() * 60 * 1000)
+    if (time1 != "") time += (time1.toInt() * 60 * 60 * 1000)
 
-    return time.toString()
+    return time.toLong()
 }
 
 @Composable
@@ -152,7 +196,7 @@ fun TimerCircle(
         val arcWidthHeight = ((radius - radiusOffset) * 2f)
         val arcSize = Size(arcWidthHeight, arcWidthHeight)
 
-        val remainderColor = Color.White.copy(alpha = 0.25f)
+        val remainderColor = Color.Cyan //.copy(alpha = 0.25f)
         val completedColor = Color.Gray
 
         val whitePercent =

@@ -63,7 +63,7 @@ fun TimePicker(vm: MainViewModel = viewModel()) {
                 .padding(4.dp)
                 .width(60.dp),
 
-        )
+            )
         Spacer(modifier = Modifier.width(10.dp))
         TextField(
             keyboardOptions = KeyboardOptions(

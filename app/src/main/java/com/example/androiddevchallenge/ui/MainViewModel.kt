@@ -19,13 +19,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
-    private val _remTime1 = MutableLiveData("Set Time to start Timer")
-    val remTime1: LiveData<String> = _remTime1
+    private val _gText = MutableLiveData("set time ⬆, start ⬇")
+    val gText: LiveData<String> = _gText
 
-    fun onRemChanged(newTime: String) {
-        _remTime1.value = newTime
+    fun changeDisplayText(greeting: String) {
+        _gText.value = greeting
+    }
+
+    private val _totalTime = MutableLiveData(1000L)
+    val totTime: LiveData<Long> = _totalTime
+
+    fun onTotChanged(newTime: Long) {
+        _totalTime.value = newTime
+    }
+
+    private val _remTime = MutableLiveData(1000L)
+    val remTime: LiveData<Long> = _remTime
+
+    fun onRemChanged(newTime: Long) {
+        _remTime.value = newTime
     }
 
     private val _time3 = MutableLiveData("")
