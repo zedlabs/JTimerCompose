@@ -15,7 +15,12 @@
  */
 package com.example.androiddevchallenge.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -27,14 +32,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-
 @Composable
 fun TimePicker(vm: MainViewModel = viewModel()) {
 
     val input1: String by vm.time1.observeAsState("")
     val input2: String by vm.time2.observeAsState("")
     val input3: String by vm.time3.observeAsState("")
-
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -63,7 +66,7 @@ fun TimePicker(vm: MainViewModel = viewModel()) {
                 .padding(4.dp)
                 .width(60.dp),
 
-            )
+        )
         Spacer(modifier = Modifier.width(10.dp))
         TextField(
             keyboardOptions = KeyboardOptions(

@@ -20,7 +20,16 @@ import android.os.CountDownTimer
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -43,7 +52,6 @@ import com.example.androiddevchallenge.ui.TimePicker
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import kotlin.math.max
 import kotlin.math.min
-
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +87,6 @@ fun MyApp() {
             TimePicker()
             TimerBox()
         }
-
     }
 }
 
@@ -87,7 +94,7 @@ fun MyApp() {
 fun TimerBox(
     modifier: Modifier = Modifier,
 
-    ) {
+) {
     val vm: MainViewModel = viewModel()
     val totTime by vm.totTime.observeAsState(0L)
     val remTime by vm.remTime.observeAsState(0L)
@@ -113,7 +120,6 @@ fun TimerBox(
         Spacer(modifier = Modifier.height(10.dp))
         StartAndPauseButton(vm)
     }
-
 }
 
 @Composable
@@ -136,30 +142,32 @@ fun StartAndPauseButton(vm: MainViewModel) {
         }.start()
     }
 
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
-        Button(onClick = {
-            val totalTime = getTimeInMs(time1, time2, time3)
-            vm.onRemChanged(0)
-            vm.onTotChanged(totalTime)
-            vm.changeDisplayText("Running...")
-            startTimer(totalTime)
-
-        }) {
+        Button(
+            onClick = {
+                val totalTime = getTimeInMs(time1, time2, time3)
+                vm.onRemChanged(0)
+                vm.onTotChanged(totalTime)
+                vm.changeDisplayText("Running...")
+                startTimer(totalTime)
+            }
+        ) {
             Text(text = "Start", color = Color.White)
         }
         Spacer(modifier = Modifier.width(10.dp))
-        Button(onClick = {
-            vm.setTime3("")
-            vm.setTime2("")
-            vm.setTime1("")
-            vm.onRemChanged(0)
-            vm.onTotChanged(0)
-            vm.changeDisplayText("set time ⬆, start ⬇")
-        }) {
+        Button(
+            onClick = {
+                vm.setTime3("")
+                vm.setTime2("")
+                vm.setTime1("")
+                vm.onRemChanged(0)
+                vm.onTotChanged(0)
+                vm.changeDisplayText("set time ⬆, start ⬇")
+            }
+        ) {
             Text(text = "Reset", color = Color.White)
         }
     }
@@ -181,52 +189,54 @@ fun TimerCircle(
     elapsedTime: Long,
     totalTime: Long
 ) {
-    Canvas(modifier = modifier
-        .fillMaxWidth()
-        .height(400.dp), onDraw = {
-        val height = size.height
-        val width = size.width
-        val dotDiameter = 12.dp
-        val strokeSize = 20.dp
-        val radiusOffset = calculateRadiusOffset(strokeSize.value, dotDiameter.value, 0f)
+    Canvas(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(400.dp),
+        onDraw = {
+            val height = size.height
+            val width = size.width
+            val dotDiameter = 12.dp
+            val strokeSize = 20.dp
+            val radiusOffset = calculateRadiusOffset(strokeSize.value, dotDiameter.value, 0f)
 
-        val xCenter = width / 2f
-        val yCenter = height / 2f
-        val radius = min(xCenter, yCenter)
-        val arcWidthHeight = ((radius - radiusOffset) * 2f)
-        val arcSize = Size(arcWidthHeight, arcWidthHeight)
+            val xCenter = width / 2f
+            val yCenter = height / 2f
+            val radius = min(xCenter, yCenter)
+            val arcWidthHeight = ((radius - radiusOffset) * 2f)
+            val arcSize = Size(arcWidthHeight, arcWidthHeight)
 
-        val remainderColor = Color.Cyan //.copy(alpha = 0.25f)
-        val completedColor = Color.Gray
+            val remainderColor = Color.Cyan // .copy(alpha = 0.25f)
+            val completedColor = Color.Gray
 
-        val whitePercent =
-            min(1f, elapsedTime.toFloat() / totalTime.toFloat())
-        val greenPercent = 1 - whitePercent
+            val whitePercent =
+                min(1f, elapsedTime.toFloat() / totalTime.toFloat())
+            val greenPercent = 1 - whitePercent
 
-        drawArc(
-            completedColor,
-            270f,
-            -greenPercent * 360f,
-            false,
-            topLeft = Offset(radiusOffset, radiusOffset),
-            size = arcSize,
-            style = Stroke(width = strokeSize.value)
-        )
+            drawArc(
+                completedColor,
+                270f,
+                -greenPercent * 360f,
+                false,
+                topLeft = Offset(radiusOffset, radiusOffset),
+                size = arcSize,
+                style = Stroke(width = strokeSize.value)
+            )
 
-        drawArc(
-            remainderColor,
-            270f,
-            whitePercent * 360,
-            false,
-            topLeft = Offset(radiusOffset, radiusOffset),
-            size = arcSize,
-            style = Stroke(width = strokeSize.value)
-        )
-
-    })
+            drawArc(
+                remainderColor,
+                270f,
+                whitePercent * 360,
+                false,
+                topLeft = Offset(radiusOffset, radiusOffset),
+                size = arcSize,
+                style = Stroke(width = strokeSize.value)
+            )
+        }
+    )
 }
 
-fun calculateRadiusOffset(strokeSize: Float, dotStrokeSize: Float, markerStrokeSize: Float)
-        : Float {
-    return max(strokeSize, max(dotStrokeSize, markerStrokeSize))
-}
+fun calculateRadiusOffset(strokeSize: Float, dotStrokeSize: Float, markerStrokeSize: Float):
+    Float {
+        return max(strokeSize, max(dotStrokeSize, markerStrokeSize))
+    }
